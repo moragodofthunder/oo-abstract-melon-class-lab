@@ -1,4 +1,5 @@
 import random
+import datetime
 
 
 """Classes for melon orders."""
@@ -9,15 +10,30 @@ class AbstractMelonOrder:
     def __init__(self, species, qty, country_code="US"):
         """initialize melon order attributes."""
 
+        if qty > 100:
+            raise TooManyMelonsError
+
         self.species = species
         self.qty = qty
         self.shipped = False
         self.country_code = country_code
 
+
     def get_base_price(self):
         """"Determine base price for melon order."""
 
         self.base_price = random.randint(5, 9)
+        
+        #Rush Hour pricing adds extra $4 charge to each order
+        #placed btw 8-11am M-F
+
+        # current_date = datetime.date.now()
+        # day_of_week = current_date.weekday()
+        # hour = current_date.hour()
+
+        # if day_of_week > 0 and day_of_week < 6:
+        #     if hour > 7.59 and hour < 11.00:
+        #         self.base_price = self.base_price + 4
 
         return self.base_price
 
@@ -34,6 +50,7 @@ class AbstractMelonOrder:
         #flat fee of $3 will be added to all int. orders < 10 melons
         if self.order_type == "international" and self.qty < 10:
             total = total + 3
+
 
         return total
 
@@ -82,3 +99,9 @@ class GovernmentMelonOrder(AbstractMelonOrder):
         """Record if an order has passed inspection."""
 
         self.passed_inspection = passed
+
+class TooManyMelonsError(ValueError):
+    """Raise when more than 100 melons are ordered at once."""
+
+    def __init__(self):
+        super().__init__("No more than 100 melons!")
